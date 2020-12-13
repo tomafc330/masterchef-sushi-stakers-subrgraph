@@ -16,7 +16,8 @@ dataSources:
       apiVersion: 0.0.4
       language: wasm/assemblyscript
       entities:
-        - StakedBalance
+        - User
+        - LiquidityPosition
       abis:
         - name: MasterChef
           file: ./abis/MasterChef.json

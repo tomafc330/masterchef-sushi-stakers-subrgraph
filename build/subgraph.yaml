@@ -1,6 +1,6 @@
 specVersion: 0.0.2
-description: Gravatar for Ethereum
-repository: https://github.com/graphprotocol/example-subgraph
+description: Fetches the user staked balances on the Sushiswap AMM protocol.
+repository: https://github.com/tommytchan/masterchef-sushi-stakers-subrgraph
 schema:
   file: schema.graphql
 dataSources:

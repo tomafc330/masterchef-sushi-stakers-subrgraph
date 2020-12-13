@@ -2,23 +2,23 @@ import {MasterChef, Deposit, Withdraw} from '../generated/MasterChef/MasterChef'
 import {LiquidityPosition, User} from '../generated/schema'
 import {Address, BigDecimal, BigInt, log} from "@graphprotocol/graph-ts";
 
-let BI_18 = BigInt.fromI32(18)
-let ZERO_BI = BigInt.fromI32(0)
-let ONE_BI = BigInt.fromI32(1)
+let BI_18 = BigInt.fromI32(18);
+let ZERO_BI = BigInt.fromI32(0);
+let ONE_BI = BigInt.fromI32(1);
 
 function exponentToBigDecimal(decimals: BigInt): BigDecimal {
-  let bd = BigDecimal.fromString('1')
+  let bd = BigDecimal.fromString('1');
   for (let i = ZERO_BI; i.lt(decimals as BigInt); i = i.plus(ONE_BI)) {
-    bd = bd.times(BigDecimal.fromString('10'))
+    bd = bd.times(BigDecimal.fromString('10'));
   }
-  return bd
+  return bd;
 }
 
 function convertTokenToDecimal(tokenAmount: BigInt, exchangeDecimals: BigInt): BigDecimal {
   if (exchangeDecimals == ZERO_BI) {
-    return tokenAmount.toBigDecimal()
+    return tokenAmount.toBigDecimal();
   }
-  return tokenAmount.toBigDecimal().div(exponentToBigDecimal(exchangeDecimals))
+  return tokenAmount.toBigDecimal().div(exponentToBigDecimal(exchangeDecimals));
 }
 
 function getLpId(poolAddress: Address, userAddress: Address): string {
@@ -27,36 +27,35 @@ function getLpId(poolAddress: Address, userAddress: Address): string {
 
 export function handleDeposit(event: Deposit): void {
   let pid = event.params.pid;
-  let contractAddrs = event.transaction.to as Address;
-  let userAddrs = event.transaction.from;
+  let contractAddrs = event.address as Address;
+  let userAddrs = event.params.user;
   handleEvent(pid, userAddrs, contractAddrs);
 }
 
 export function handleWithdraw(event: Withdraw): void {
   let pid = event.params.pid;
-  let contractAddrs = event.transaction.to as Address;
-  let userAddrs = event.transaction.from;
+  let contractAddrs = event.address as Address;
+  let userAddrs = event.params.user;
   handleEvent(pid, userAddrs, contractAddrs);
 }
 
 function handleEvent(pid: BigInt, userAddrs: Address, contractAddrs: Address): void {
   let masterChef = MasterChef.bind(contractAddrs);
   let pool = masterChef.poolInfo(pid);
-  let poolAddress = pool.value0
-  let userId = userAddrs.toHex()
-  let user = User.load(userId)
+  let poolAddress = pool.value0;
+  let userId = userAddrs.toHex();
+  let user = User.load(userId);
   if (user == null) {
-    user = new User(userId)
-    user.save()
+    user = new User(userId);
+    user.save();
   }
-  let lpId = getLpId(poolAddress, userAddrs)
-  let lp = LiquidityPosition.load(lpId)
+  let lpId = getLpId(poolAddress, userAddrs);
+  let lp = LiquidityPosition.load(lpId);
   if (lp == null) {
-    lp = new LiquidityPosition(lpId)
-    lp.user = user.id
+    lp = new LiquidityPosition(lpId);
+    lp.user = user.id;
+    lp.poolAddress = poolAddress;
   }
-  lp.poolAddress = poolAddress
-  lp.balance = convertTokenToDecimal(masterChef.userInfo(pid, userAddrs).value0, BI_18)
-  lp.pendingReward = convertTokenToDecimal(masterChef.pendingSushi(pid, userAddrs), BI_18)
-  lp.save()
+  lp.balance = convertTokenToDecimal(masterChef.userInfo(pid, userAddrs).value0, BI_18);
+  lp.save();
 }

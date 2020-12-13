@@ -13,7 +13,7 @@ To deploy, please use:
     --debug \
     --node https://api.thegraph.com/deploy/ \
     --ipfs https://api.thegraph.com/ipfs/ \
-    tommytchan/sushiswap-masterchef-balances
+    apyvision/sushiswap-masterchef-balances
 ```
 
 If you have any questions, please feel free to ping tom@liquidity.vision!

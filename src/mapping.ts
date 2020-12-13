@@ -54,8 +54,9 @@ function handleEvent(pid: BigInt, userAddrs: Address, contractAddrs: Address): v
   if (lp == null) {
     lp = new LiquidityPosition(lpId);
     lp.user = user.id;
-    lp.poolAddress = poolAddress;
   }
-  lp.balance = convertTokenToDecimal(masterChef.userInfo(pid, userAddrs).value0, BI_18);
-  lp.save();
+  lp.poolAddress = poolAddress
+  lp.balance = convertTokenToDecimal(masterChef.userInfo(pid, userAddrs).value0, BI_18)
+  lp.pendingReward = convertTokenToDecimal(masterChef.pendingSushi(pid, userAddrs), BI_18)
+  lp.save()
 }
